@@ -1,16 +1,20 @@
 import 'package:BobotMobileController/interfaces/ui/listable.dart';
+import 'package:BobotMobileController/models/device.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class BLE implements UIListable {
-  BLE({this.name});
+  Device _device;
+  Device getDevice() => _device;
 
-  final String name;
+  BLE({Device device}) {
+    this._device = device;
+  }
 
   @override
   Widget buildSubtitle(BuildContext context) {
     return Text(
-      name,
+      _device.getName(),
       style: Theme.of(context).textTheme.headline6,
     ); // Text
   }

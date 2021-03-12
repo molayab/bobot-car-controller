@@ -2,7 +2,7 @@
 
 ## Introduction.
 
-Bobot Controller is a mobile controller that controls the Botot (iot) car. It uses flutter as a backbone for both Android and iOS compatibility. It requires BLE IO capabilities of your device. For that project issues `flutter_blue` an external [library](https://pub.dev/packages/flutter_blue).
+Bobot Controller is a mobile controller that controls the Boot (IoT) car. It uses flutter as a backbone for both Android and iOS compatibility. It requires the BLE IO capabilities of your device. For that project issues `flutter_blue` an external [library](https://pub.dev/packages/flutter_blue).
 
 ## Getting Started
 
@@ -31,7 +31,7 @@ flutter run
 This scene shows the list of scanned BLE devices. It allows select any of them and begin a try of connection using Bobot's controller protocol, otherwise, it shows the error. 
 
 ### Bobot Controller Scene
-This scene shows a bobot connection info and some debug data helpful for controlling the device. It also contains a single and huge software-based JoyStick that controls the whole device velocity and heading. It contains an admin control menu to shutdown, reset and disconnect the device.
+This scene shows a bobot connection info and some debug data helpful for controlling the device. It also contains a single and huge software-based JoyStick that controls the whole device velocity and heading. It contains an admin control menu to shut down, reset and disconnect the device.
 
 ## App Architecture 
 
@@ -40,7 +40,13 @@ Flutter Widgets... TBD
 
 ### Defined Interfaces 
 
- 1. **Listable**: *Useful interface to enable ListView to render capabilities into the model. See Flutter's [ListView](https://api.flutter.dev/flutter/widgets/ListView-class.html) for more information.*
+ 1. **UIListable**: *Useful interface to enable ListView to render capabilities into the model. See Flutter's [ListView](https://api.flutter.dev/flutter/widgets/ListView-class.html) for more information.*
+```dart
+ abstract class UIListable {
+   Widget buildTitle(BuildContext context);
+   Widget buildSubtitle(BuildContext context);
+ }
+```
 
 ## Providers 
 Dart artifacts that interact with the domain layer. TBD

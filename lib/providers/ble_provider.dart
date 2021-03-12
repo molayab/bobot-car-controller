@@ -1,12 +1,30 @@
 import 'package:BobotMobileController/models/ble.dart';
+import 'package:BobotMobileController/models/dummy_device.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 
 class BLEProvider {
+  FlutterBlue _flutterBlue;
+
+  BLEProvider() {
+    this._flutterBlue = FlutterBlue.instance;
+  }
+
+  void run() {
+
+  }
+
+  void stop() {
+    
+  }
+
   List<BLE> getAllDevices() {
     return [
-      BLE(name: "test 1"),
-      BLE(name: "test 2"),
+      BLE(device: DummyDevice()),
+      BLE(device: DummyDevice()),
     ];
   }
 
-  void connectToDevice() {}
+  Future tryToConnect(BLE ble) {
+    return ble.getDevice().connect();
+  }
 }
