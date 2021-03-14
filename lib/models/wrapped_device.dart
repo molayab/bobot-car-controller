@@ -30,4 +30,9 @@ class WrappedDevice extends Device {
   DeviceState getState() {
     return DeviceState.error;
   }
+
+  @override
+  String getUUID() {
+    return device.id.toString();
+  }
 }

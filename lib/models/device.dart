@@ -9,6 +9,7 @@ enum DeviceState {
 abstract class Device<DeviceService> {
   String getName();
   DeviceState getState();
+  String getUUID();
 
   Future connect();
   Future disconnect();

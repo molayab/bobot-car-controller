@@ -18,16 +18,28 @@ class ConnectionView extends StatefulWidget {
 class _ConnectionViewState extends State<ConnectionView> {
   final BLEProvider bleProvider;
   BuildContext _loadingContext;
-  List<BLE> _devices;
-  bool _isScanning = false;
+  List<BLE> _devices = [];
+  bool _isScanning = true;
 
   _ConnectionViewState({this.bleProvider}) {
-    _devices = bleProvider.getAllDevices();
+    bleProvider.run();
+    Future.delayed(Duration(milliseconds: 850)).then((value) => refreshDevices());
   }
 
-  void refreshDevices() {
+  @override
+  void dispose() {
+    print("Stopping BLE scanning...");
+    bleProvider.stop();
+    super.dispose();
+  }
+
+  void refreshDevices() async {
+    if (!_isScanning) { return; }
+    final devices = await bleProvider.getAllDevices();
+    devices.removeWhere((d) => d.getDevice().getName() == "" || d.getDevice().getName() == null);
+    
     setState(() {
-      this._devices = bleProvider.getAllDevices();      
+      this._devices = devices;
     });
   }
 

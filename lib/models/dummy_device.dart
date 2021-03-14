@@ -36,4 +36,9 @@ class DummyDevice implements Device {
   DeviceState getState() {
     return _state;
   }
+
+  @override
+  String getUUID() {
+    return UniqueKey().toString();
+  }
 }

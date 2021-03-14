@@ -14,11 +14,16 @@ class BLE implements UIListable {
   @override
   Widget buildSubtitle(BuildContext context) {
     return Text(
-      _device.getName(),
-      style: Theme.of(context).textTheme.headline6,
+      _device.getUUID(),
+      style: Theme.of(context).textTheme.subtitle1,
     ); // Text
   }
 
   @override
-  Widget buildTitle(BuildContext context) => null;
+  Widget buildTitle(BuildContext context) {
+    return Text(
+      _device.getName(),
+      style: Theme.of(context).textTheme.headline6,
+    );
+  }
 }
