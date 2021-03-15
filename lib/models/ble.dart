@@ -7,7 +7,7 @@ class BLE implements UIListable {
   Device _device;
   Device getDevice() => _device;
 
-  BLE({Device device}) {
+  BLE(Device device) {
     this._device = device;
   }
 

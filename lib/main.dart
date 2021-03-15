@@ -1,4 +1,5 @@
 import 'package:BobotMobileController/providers/ble_provider.dart';
+import 'package:BobotMobileController/providers/bobot_client_provider.dart';
 import 'package:BobotMobileController/scenes/connection/connection_view.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: ConnectionView(
-        bleProvider: BLEProvider(),
+        bobotProvider: BobotProvider(new BLEProvider()),
       ),
     );
   }

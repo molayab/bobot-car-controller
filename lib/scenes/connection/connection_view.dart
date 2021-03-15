@@ -1,59 +1,67 @@
-import 'package:BobotMobileController/models/ble.dart';
-import 'package:BobotMobileController/providers/ble_provider.dart';
+import 'package:BobotMobileController/models/bobot/bobot_server_model.dart';
+import 'package:BobotMobileController/providers/bobot_client_provider.dart';
 import 'package:BobotMobileController/scenes/controller/controller_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ConnectionView extends StatefulWidget {
-  final BLEProvider bleProvider;
+  final BobotProvider bobotProvider;
 
-  ConnectionView({this.bleProvider});
+  ConnectionView({this.bobotProvider});
 
   @override
   State<StatefulWidget> createState() {
-    return _ConnectionViewState(bleProvider: bleProvider);
+    return _ConnectionViewState(bobotProvider: bobotProvider);
   }
 }
 
 class _ConnectionViewState extends State<ConnectionView> {
-  final BLEProvider bleProvider;
+  final BobotProvider bobotProvider;
   BuildContext _loadingContext;
-  List<BLE> _devices = [];
+  List<BobotServerModel> _devices = [];
   bool _isScanning = true;
 
-  _ConnectionViewState({this.bleProvider}) {
-    bleProvider.run();
-    Future.delayed(Duration(milliseconds: 850)).then((value) => refreshDevices());
+  _ConnectionViewState({this.bobotProvider}) {
+    bobotProvider.startSearch();
+    Future.delayed(Duration(milliseconds: 850)).then((_) => refreshDevices());
   }
 
   @override
   void dispose() {
     print("Stopping BLE scanning...");
-    bleProvider.stop();
+    bobotProvider.stopSearch();
     super.dispose();
   }
 
   void refreshDevices() async {
-    if (!_isScanning) { return; }
-    final devices = await bleProvider.getAllDevices();
-    devices.removeWhere((d) => d.getDevice().getName() == "" || d.getDevice().getName() == null);
-    
+    if (!_isScanning) {
+      return;
+    }
+    final devices = await bobotProvider.getAllDevices();
+    devices.removeWhere((d) =>
+        d.getDevice().getName() == "" || d.getDevice().getName() == null);
+
     setState(() {
       this._devices = devices;
     });
   }
 
-  void _tryConnectTo({BLE device, BuildContext inContext}) {
-    bleProvider.tryToConnect(device).then((_) {
-      print("connected ${device.getDevice().getName()}");
-      Navigator.pop(_loadingContext);
-      Navigator.push(
-        inContext,
-        MaterialPageRoute(
-          builder: (context) => ControllerView()
-        )
-      );
-    });
+  void _tryConnectTo({BobotServerModel device, BuildContext inContext}) async {
+    try {
+      final characteristics = await device.discoverCharacteristics();
+      // TODO: Create a dynamic selection of the characteristic.
+      final tmp = characteristics.first;
+      bobotProvider.usingCharacteristic(tmp);
+      bobotProvider.selectBobot(device);
+      bobotProvider.connect().then((_) {
+        print("connected ${device.getDevice().getName()}");
+        Navigator.pop(_loadingContext);
+        Navigator.push(inContext,
+            MaterialPageRoute(builder: (context) => ControllerView()));
+      });
+    } catch (e) {
+      print("Error. ${e.toString()}");
+    }
   }
 
   Future refresh() {
@@ -65,21 +73,23 @@ class _ConnectionViewState extends State<ConnectionView> {
   void _showLoading(BuildContext context) {
     _loadingContext = context;
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Center(child: CircularProgressIndicator(),);
-    });
+        context: context,
+        builder: (BuildContext context) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        });
   }
 
   void _toggleScanning() {
     setState(() {
       if (_isScanning) {
-        bleProvider.stop();
+        bobotProvider.stopSearch();
         _isScanning = false;
       } else {
-        bleProvider.run();
+        bobotProvider.startSearch();
         _isScanning = true;
-      } 
+      }
     });
   }
 
@@ -90,25 +100,20 @@ class _ConnectionViewState extends State<ConnectionView> {
         title: Text("Devices"),
       ),
       body: RefreshIndicator(
-        onRefresh: () => refresh(),
-        child: ListView.builder(
-          itemCount: _devices.length,
-          itemBuilder: (context, index) {
-            final device = _devices[index];
-            return ListTile(
-              title: device.buildTitle(context),
-              subtitle: device.buildSubtitle(context),
-              onTap: (){
-                _showLoading(context);
-                _tryConnectTo(
-                  device: device,
-                  inContext: context
+          onRefresh: () => refresh(),
+          child: ListView.builder(
+              itemCount: _devices.length,
+              itemBuilder: (context, index) {
+                final device = _devices[index];
+                return ListTile(
+                  title: device.buildTitle(context),
+                  subtitle: device.buildSubtitle(context),
+                  onTap: () {
+                    _showLoading(context);
+                    _tryConnectTo(device: device, inContext: context);
+                  },
                 );
-              },
-            );
-          }
-        )
-      ),
+              })),
       floatingActionButton: FloatingActionButton(
         child: Icon(_isScanning ? Icons.stop : Icons.search),
         onPressed: () => _toggleScanning(),

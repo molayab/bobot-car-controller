@@ -9,12 +9,14 @@ class BLEProvider {
   BLEProvider() {
     this._flutterBlue = FlutterBlue.instance;
   }
-  
+
   void run() {
     _flutterBlue.startScan(timeout: Duration(seconds: 10));
     _flutterBlue.scanResults.listen((results) {
       _cachedDevices = Future(() {
-        return results.map((device) => BLE(device: WrappedDevice(device.device))).toList();
+        return results
+            .map((device) => BLE(WrappedDevice(device.device)))
+            .toList();
       });
     });
   }
