@@ -30,8 +30,6 @@ class BobotServerModel extends BLE {
     });
     return future;
   }
-
-  void sendCommand(BobotCommand command) {}
 }
 
 enum BobotServerModelHearbeat { live, dead }
